@@ -1,4 +1,630 @@
-<!DOCTYPE html>
+// Show reference button functionality
+            document.getElementById('show-reference').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('reference-modal').style.display = 'flex';
+            });
+            
+            // Close reference modal
+            document.querySelector('#reference-modal .close-modal').addEventListener('click', function() {
+                document.getElementById('reference-modal').style.display = 'none';
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                const referenceModal = document.getElementById('reference-modal');
+                if (event.target === referenceModal) {
+                    referenceModal.style.display = 'none';
+                }
+            });        .reference-content {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 0 1rem 1rem 1rem;
+        }
+        
+        .reference-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        .reference-table th, .reference-table td {
+            border: 1px solid #444;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        
+        .reference-table th {
+            background-color: #333;
+        }
+        
+        .reference-table tr:nth-child(even) {
+            background-color: #383838;
+        }
+        
+        .reference-table code {
+            background-color: #252525;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .reference-btn {
+            padding: 0.5rem 1rem;
+            background-color: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: auto;
+            margin-right: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .reference-btn:hover {
+            background-color: rgba(65, 105, 225, 0.1);
+        }                10: {
+                    title: "GCD Calculation",
+                    difficulty: "hard",
+                    description: `<p>Implement the Euclidean algorithm to compute the greatest common divisor (GCD) of two integers.</p>
+                    <p>Your code should:</p>
+                    <ol>
+                        <li>Load the first number from memory location 0x1000</li>
+                        <li>Load the second number from memory location 0x1004</li>
+                        <li>Calculate the GCD using the Euclidean algorithm</li>
+                        <li>Store the result at memory location 0x1008</li>
+                    </ol>
+                    <p>The Euclidean algorithm uses the property that GCD(a,b) = GCD(b, a mod b)</p>`,
+                    example: `Given:
+- Memory[0x1000] = 48
+- Memory[0x1004] = 18
+
+After execution:
+- Memory[0x1008] = 6 (the GCD of 48 and 18)`,
+                    memoryLayout: [
+                        { address: "0x1000", description: "First number (a)", value: "48" },
+                        { address: "0x1004", description: "Second number (b)", value: "18" },
+                        { address: "0x1008", description: "Result (GCD)", value: "0" }
+                    ],
+                    constraints: [
+                        "You must use only SM213 instructions.",
+                        "Your solution should implement the Euclidean algorithm.",
+                        "The numbers will be positive integers."
+                    ],
+                    expectedOutput: "Memory[0x1008] = 6",
+                    hint: "In the Euclidean algorithm, you repeatedly divide the larger number by the smaller one and replace the larger with the remainder until one of the numbers becomes zero. The non-zero number at the end is the GCD.",
+                    template: `# GCD Calculation
+# Calculate the greatest common divisor of two numbers
+# First number is at memory location 0x1000
+# Second number is at memory location 0x1004
+# Store the result at memory location 0x1008
+
+`,
+                    solution: `# Solution for GCD Calculation
+ld 0x1000, r0   # Load first number (a)
+ld 0x1004, r1   # Load second number (b)
+
+# Euclidean algorithm: GCD(a,b) = GCD(b, a mod b)
+L0: beq r1, L3  # If b == 0, GCD is in r0, exit
+
+    # Calculate a mod b (remainder of a/b)
+    mov r0, r2  # Copy a to r2 (dividend)
+    mov r1, r3  # Copy b to r3 (divisor)
+    ld $0, r4   # Clear r4 for quotient
+    
+    # Division loop to calculate quotient
+L1: bgt r3, r2, L2  # If divisor > dividend, division complete
+    sub r3, r2      # Subtract divisor from dividend
+    inc r4          # Increment quotient
+    br L1           # Continue division loop
+    
+L2: # After division, r2 contains the remainder (a mod b)
+    mov r1, r0      # a = b
+    mov r2, r1      # b = a mod b
+    br L0           # Continue GCD calculation
+    
+L3: # GCD is in r0
+    st r0, 0x1008   # Store result
+`
+                }
+                // Additional problems would be added in a similar manner                9: {
+                    title: "Count Set Bits",
+                    difficulty: "medium",
+                    description: `<p>Write SM213 assembly code to count the number of set bits (1s) in the binary representation of a number.</p>
+                    <p>Your code should:</p>
+                    <ol>
+                        <li>Load the number from memory location 0x1000</li>
+                        <li>Count the number of bits that are set to 1 in its binary representation</li>
+                        <li>Store the result at memory location 0x1004</li>
+                    </ol>`,
+                    example: `Given:
+- Memory[0x1000] = 22 (binary: 10110)
+
+After execution:
+- Memory[0x1004] = 3 (because there are three 1s in the binary representation)`,
+                    memoryLayout: [
+                        { address: "0x1000", description: "Input number", value: "22" },
+                        { address: "0x1004", description: "Result (bit count)", value: "0" }
+                    ],
+                    constraints: [
+                        "You must use only SM213 instructions.",
+                        "Your solution should work for any non-negative 32-bit integer."
+                    ],
+                    expectedOutput: "Memory[0x1004] = 3",
+                    hint: "You can use a loop to check each bit. Repeatedly shift the number right and use a bitwise operation to check if the least significant bit is set.",
+                    template: `# Count Set Bits
+# Count the number of bits set to 1 in a number
+# Input number is at memory location 0x1000
+# Store the result at memory location 0x1004
+
+`,
+                    solution: `# Solution for Count Set Bits
+ld 0x1000, r0   # Load input number
+ld $0, r1       # Initialize counter for set bits
+ld $1, r2       # r2 = 1 (mask for checking bits)
+ld $32, r3      # r3 = 32 (number of bits in a 32-bit integer)
+
+# Loop through each bit
+L0: beq r3, L2      # If no more bits to check, exit loop
+    ld $0, r4       # Clear r4 for storing bit check result
+    
+    # Check if current bit is set
+    mov r0, r5      # Copy current value to r5
+    and r2, r5      # r5 = r5 & 1 (isolate least significant bit)
+    beq r5, L1      # If bit is 0, skip increment
+    inc r1          # Increment counter
+    
+L1: # Shift number right by 1 bit
+    ld $1, r4       # r4 = 1 (for right shift)
+    ld $0, r5       # Clear r5 for division result
+    
+    # Perform right shift (division by 2)
+    ld $2, r6       # r6 = divisor (2)
+    ld $0, r5       # Clear r5 for quotient
+    ld $0, r7       # Clear r7 for remainder
+    
+    # Division loop
+L3: bgt r6, r0, L4  # If divisor > dividend, division complete
+    sub r6, r0      # Subtract divisor from dividend
+    inc r5          # Increment quotient
+    br L3           # Continue division
+    
+L4: mov r5, r0      # Update number with shifted value
+    dec r3          # Decrement bit count
+    br L0           # Continue checking bits
+    
+L2: st r1, 0x1004   # Store the result
+`
+                },                8: {
+                    title: "Bubble Sort",
+                    difficulty: "hard",
+                    description: `<p>Implement the bubble sort algorithm to sort an array of integers in ascending order.</p>
+                    <p>Your code should:</p>
+                    <ol>
+                        <li>Load the array length from memory location 0x1000</li>
+                        <li>The array to be sorted starts at memory location 0x1004</li>
+                        <li>Sort the array in-place using the bubble sort algorithm</li>
+                    </ol>`,
+                    example: `Given:
+- Memory[0x1000] = 5 (array length)
+- Memory[0x1004] = 30
+- Memory[0x1008] = 10
+- Memory[0x100C] = 50
+- Memory[0x1010] = 20
+- Memory[0x1014] = 40
+
+After execution:
+- Memory[0x1004] = 10
+- Memory[0x1008] = 20
+- Memory[0x100C] = 30
+- Memory[0x1010] = 40
+- Memory[0x1014] = 50`,
+                    memoryLayout: [
+                        { address: "0x1000", description: "Array length", value: "5" },
+                        { address: "0x1004", description: "Array[0]", value: "30" },
+                        { address: "0x1008", description: "Array[1]", value: "10" },
+                        { address: "0x100C", description: "Array[2]", value: "50" },
+                        { address: "0x1010", description: "Array[3]", value: "20" },
+                        { address: "0x1014", description: "Array[4]", value: "40" }
+                    ],
+                    constraints: [
+                        "You must use only SM213 instructions.",
+                        "Your solution should work for any array length and values.",
+                        "You must implement bubble sort with the correct number of passes and comparisons."
+                    ],
+                    expectedOutput: "Memory[0x1004] = 10\nMemory[0x1008] = 20\nMemory[0x100C] = 30\nMemory[0x1010] = 40\nMemory[0x1014] = 50",
+                    hint: "Bubble sort involves nested loops. The outer loop iterates through passes, and the inner loop compares and swaps adjacent elements.",
+                    template: `# Bubble Sort
+# Sort an array in ascending order using bubble sort
+# Array length is at memory location 0x1000
+# Array elements start at memory location 0x1004
+
+`,
+                    solution: `# Solution for Bubble Sort
+ld 0x1000, r0   # Load array length
+ld $0x1004, r1  # Base address of array
+ld $4, r2       # Element size (4 bytes)
+ld $1, r3       # r3 = 1 (for decrementing loops)
+
+# Outer loop (n-1 passes)
+mov r0, r4      # Copy length to r4
+dec r4          # Number of passes = length - 1
+
+L0: beq r4, L4  # If r4 == 0, sorting complete
+    
+    # Inner loop (comparing adjacent elements)
+    mov r0, r5      # Initialize inner loop counter with length
+    dec r5          # Adjust for comparisons (length - 1)
+    sub r4, r5      # Subtract pass number (r5 = length - 1 - pass)
+    ld $0x1004, r6  # Reset current element pointer
+
+L1: beq r5, L3      # If inner loop done, go to next pass
+    
+    # Compare adjacent elements
+    ld (r6), r7     # Load current element
+    add r2, r6      # Move to next element
+    ld (r6), r0     # Load next element
+    
+    # If current <= next, no swap needed
+    bgt r7, r0, L2  # If current > next, need to swap
+    br L5           # Skip swap
+    
+L2: # Swap elements
+    st r0, (r6)     # Store the smaller value at higher address
+    sub r2, r6      # Move back to previous element
+    st r7, (r6)     # Store the larger value at lower address
+    add r2, r6      # Move forward again
+    
+L5: dec r5          # Decrement inner loop counter
+    br L1           # Continue inner loop
+    
+L3: dec r4          # Decrement outer loop counter (passes)
+    br L0           # Continue outer loop
+    
+L4: # Sorting complete
+`
+                },                7: {
+                    title: "Binary Search",
+                    difficulty: "hard",
+                    description: `<p>Implement binary search to find a target value in a sorted array.</p>
+                    <p>Your code should:</p>
+                    <ol>
+                        <li>Load the array length from memory location 0x1000</li>
+                        <li>Load the target value from memory location 0x1004</li>
+                        <li>The sorted array starts at memory location 0x1008</li>
+                        <li>Find the index of the target value in the array</li>
+                        <li>If found, store the index at memory location 0x2000</li>
+                        <li>If not found, store -1 at memory location 0x2000</li>
+                    </ol>`,
+                    example: `Given:
+- Memory[0x1000] = 6 (array length)
+- Memory[0x1004] = 25 (target value)
+- Memory[0x1008] = 5
+- Memory[0x100C] = 10
+- Memory[0x1010] = 15
+- Memory[0x1014] = 20
+- Memory[0x1018] = 25
+- Memory[0x101C] = 30
+
+After execution:
+- Memory[0x2000] = 4 (index of value 25)`,
+                    memoryLayout: [
+                        { address: "0x1000", description: "Array length", value: "6" },
+                        { address: "0x1004", description: "Target value", value: "25" },
+                        { address: "0x1008", description: "Array[0]", value: "5" },
+                        { address: "0x100C", description: "Array[1]", value: "10" },
+                        { address: "0x1010", description: "Array[2]", value: "15" },
+                        { address: "0x1014", description: "Array[3]", value: "20" },
+                        { address: "0x1018", description: "Array[4]", value: "25" },
+                        { address: "0x101C", description: "Array[5]", value: "30" },
+                        { address: "0x2000", description: "Result (index or -1)", value: "0" }
+                    ],
+                    constraints: [
+                        "You must use only SM213 instructions.",
+                        "Your solution should work for any array length and values.",
+                        "The array is guaranteed to be sorted in ascending order.",
+                        "You must implement true binary search, not a linear search."
+                    ],
+                    expectedOutput: "Memory[0x2000] = 4",
+                    hint: "Binary search requires maintaining left and right indices. Repeatedly compute the middle index and compare the element at that index with the target value.",
+                    template: `# Binary Search
+# Find the index of a target value in a sorted array
+# Array length is at memory location 0x1000
+# Target value is at memory location 0x1004
+# Array elements start at memory location 0x1008
+# Store result (index or -1) at memory location 0x2000
+
+`,
+                    solution: `# Solution for Binary Search
+ld 0x1000, r0   # Load array length
+ld 0x1004, r1   # Load target value
+ld $0, r2       # Left index (low)
+ld $0x1008, r3  # Base address of array
+ld $4, r4       # Element size (4 bytes)
+dec r0          # Adjust for 0-indexed array
+mov r0, r5      # Right index (high) = length - 1
+
+# Binary search loop
+L0: bgt r2, r5, L4  # If low > high, element not found
+
+    # Calculate mid = (low + high) / 2
+    mov r2, r6      # Copy low to r6
+    add r5, r6      # r6 = low + high
+    ld $2, r7       # r7 = 2 for division
+    ld $0, r0       # r0 will hold result of division
+    
+L1: bgt r7, r6, L2  # If divisor > dividend, division complete
+    sub r7, r6      # Subtract divisor from dividend
+    inc r0          # Increment result
+    br L1           # Continue division loop
+    
+L2: mov r0, r7      # r7 = mid index
+    
+    # Calculate address of mid element: base + mid * 4
+    ld $0, r0       # Clear r0 for address calculation
+    mov r7, r6      # Copy mid index to r6
+    
+L3: beq r6, L5      # If counter == 0, done calculating address
+    add r4, r0      # Add element size to offset
+    dec r6          # Decrement counter
+    br L3           # Continue calculating
+    
+L5: add r3, r0      # r0 = base address + offset
+    ld (r0), r6     # Load the mid element into r6
+    
+    # Compare mid element with target
+    bgt r1, r6, L6  # If target > mid element, search right half
+    beq r1, r6, L7  # If target == mid element, found it
+    
+    # Target < mid element, search left half
+    dec r7          # mid - 1
+    mov r7, r5      # high = mid - 1
+    br L0           # Continue search
+    
+L6: # Search right half
+    inc r7          # mid + 1
+    mov r7, r2      # low = mid + 1
+    br L0           # Continue search
+    
+L7: # Found the element at index in r7
+    st r7, 0x2000   # Store the index
+    br L8           # Exit
+    
+L4: # Element not found
+    ld $-1, r0      # Load -1 as result
+    st r0, 0x2000   # Store -1 in result
+    
+L8: # Done
+`
+                },                6: {
+                    title: "Fibonacci Sequence",
+                    difficulty: "medium",
+                    description: `<p>Write SM213 assembly code to generate Fibonacci numbers and store them in memory.</p>
+                    <p>Your code should:</p>
+                    <ol>
+                        <li>Load the number of Fibonacci terms (N) from memory location 0x1000</li>
+                        <li>Generate the first N Fibonacci numbers (F(0) = 0, F(1) = 1, F(n) = F(n-1) + F(n-2))</li>
+                        <li>Store the results in consecutive memory locations starting at 0x1004</li>
+                    </ol>`,
+                    example: `Given:
+- Memory[0x1000] = 8 (number of terms)
+
+After execution:
+- Memory[0x1004] = 0 (F(0))
+- Memory[0x1008] = 1 (F(1))
+- Memory[0x100C] = 1 (F(2))
+- Memory[0x1010] = 2 (F(3))
+- Memory[0x1014] = 3 (F(4))
+- Memory[0x1018] = 5 (F(5))
+- Memory[0x101C] = 8 (F(6))
+- Memory[0x1020] = 13 (F(7))`,
+                    memoryLayout: [
+                        { address: "0x1000", description: "Number of terms (N)", value: "8" },
+                        { address: "0x1004", description: "F(0)", value: "0" },
+                        { address: "0x1008", description: "F(1)", value: "0" },
+                        { address: "0x100C", description: "F(2)", value: "0" },
+                        { address: "0x1010", description: "F(3)", value: "0" },
+                        { address: "0x1014", description: "F(4)", value: "0" },
+                        { address: "0x1018", description: "F(5)", value: "0" },
+                        { address: "0x101C", description: "F(6)", value: "0" },
+                        { address: "0x1020", description: "F(7)", value: "0" }
+                    ],
+                    constraints: [
+                        "You must use only SM213 instructions.",
+                        "Your solution should work for N values from 1 to 20.",
+                        "The initial values F(0) = 0 and F(1) = 1 must be set by your code."
+                    ],
+                    expectedOutput: "Memory[0x1004] = 0\nMemory[0x1008] = 1\nMemory[0x100C] = 1\nMemory[0x1010] = 2\nMemory[0x1014] = 3\nMemory[0x1018] = 5\nMemory[0x101C] = 8\nMemory[0x1020] = 13",
+                    hint: "Start by storing F(0) and F(1), then use a loop to calculate each subsequent term as the sum of the two previous terms.",
+                    template: `# Fibonacci Sequence
+# Generate the first N Fibonacci numbers
+# N is stored at memory location 0x1000
+# Store the results starting at memory location 0x1004
+
+`,
+                    solution: `# Solution for Fibonacci Sequence
+ld 0x1000, r0   # Load N into r0
+ld $0, r1       # F(0) = 0
+ld $1, r2       # F(1) = 1
+ld $0x1004, r3  # Address of result array
+
+# Store F(0)
+st r1, (r3)     # Store F(0) at the first position
+add r3, r3      # Move to next position
+st r2, (r3)     # Store F(1) at the second position
+
+# Check if we're done (N <= 2)
+ld $2, r4       # r4 = 2
+bgt r0, r4, L0  # If N > 2, continue
+br L2           # Otherwise, we're done
+
+# Generate Fibonacci sequence
+L0: ld $2, r4       # Initialize counter i = 2
+    ld $4, r5       # Element size = 4 bytes
+
+L1: bgt r4, r0, L2  # If i > N, exit loop
+    mov r1, r6      # Store F(i-2) temporarily in r6
+    mov r2, r1      # F(i-2) = F(i-1)
+    add r6, r2      # F(i-1) = F(i-2) + F(i-1) = F(i)
+    
+    # Store F(i)
+    add r3, r3      # Move to next position
+    st r2, (r3)     # Store F(i)
+    
+    inc r4          # i++
+    br L1           # Continue loop
+
+L2: # Done!
+`
+                },                5: {
+                    title: "Reverse Array",
+                    difficulty: "medium",
+                    description: `<p>Write SM213 assembly code to reverse the order of elements in an array.</p>
+                    <p>Your code should:</p>
+                    <ol>
+                        <li>The array length is stored at memory location 0x1000</li>
+                        <li>The array elements start at memory location 0x1004</li>
+                        <li>Reverse the array in-place (modify the original array)</li>
+                    </ol>`,
+                    example: `Given:
+- Memory[0x1000] = 5 (array length)
+- Memory[0x1004] = 10 (first element)
+- Memory[0x1008] = 20
+- Memory[0x100C] = 30
+- Memory[0x1010] = 40
+- Memory[0x1014] = 50 (last element)
+
+After execution:
+- Memory[0x1004] = 50 (first element, swapped)
+- Memory[0x1008] = 40
+- Memory[0x100C] = 30
+- Memory[0x1010] = 20
+- Memory[0x1014] = 10 (last element, swapped)`,
+                    memoryLayout: [
+                        { address: "0x1000", description: "Array length", value: "5" },
+                        { address: "0x1004", description: "Array[0]", value: "10" },
+                        { address: "0x1008", description: "Array[1]", value: "20" },
+                        { address: "0x100C", description: "Array[2]", value: "30" },
+                        { address: "0x1010", description: "Array[3]", value: "40" },
+                        { address: "0x1014", description: "Array[4]", value: "50" }
+                    ],
+                    constraints: [
+                        "You must use only SM213 instructions.",
+                        "Your solution should work for any array length and values.",
+                        "You must reverse the array in-place (do not create a new array)."
+                    ],
+                    expectedOutput: "Memory[0x1004] = 50\nMemory[0x1008] = 40\nMemory[0x100C] = 30\nMemory[0x1010] = 20\nMemory[0x1014] = 10",
+                    hint: "You'll need to iterate from both ends of the array toward the middle, swapping pairs of elements as you go.",
+                    template: `# Reverse Array
+# Reverse the order of elements in an array
+# Array length is at memory location 0x1000
+# Array elements start at memory location 0x1004
+
+`,
+                    solution: `# Solution for Reverse Array
+ld 0x1000, r0    # Load array length into r0
+ld $0x1004, r1   # Base address of the array in r1
+ld $4, r2        # Element size (4 bytes) in r2
+dec r0           # Adjust length for 0-indexing
+
+# Calculate last element address
+ld $0, r3        # r3 will hold last element offset (length-1) * 4
+mov r0, r4       # Copy adjusted length to r4 for counting
+
+L0: beq r4, L1   # If counter == 0, exit loop
+    add r2, r3   # Add element size to offset (r3 += 4)
+    dec r4       # Decrement counter
+    br L0        # Repeat loop
+    
+L1: ld $0, r4    # r4 = left index (0)
+    mov r0, r5   # r5 = right index (length-1)
+
+# Main swap loop
+L2: bgt r4, r5, L6   # If left > right, we're done
+
+    # Calculate left address: base + left_index * 4
+    mov r4, r6       # Copy left index to r6
+    ld $0, r7        # r7 will hold left offset
+    
+L3: beq r6, L4       # If counter == 0, finished calculating
+    add r2, r7       # Add element size to offset
+    dec r6           # Decrement counter
+    br L3            # Repeat loop
+    
+L4: add r1, r7       # r7 = base + left_offset (address of left element)
+    ld (r7), r6      # Load left element into r6
+    
+    # Calculate right address: base + right_index * 4
+    mov r5, r0       # Copy right index to r0
+    ld $0, r3        # r3 will hold right offset
+    
+L5: beq r0, L7       # If counter == 0, finished calculating
+    add r2, r3       # Add element size to offset
+    dec r0           # Decrement counter
+    br L5            # Repeat loop
+    
+L7: add r1, r3       # r3 = base + right_offset (address of right element)
+    ld (r3), r0      # Load right element into r0
+    
+    # Swap elements
+    st r6, (r3)      # Store left element at right address
+    st r0, (r7)      # Store right element at left address
+    
+    # Move indices toward the middle
+    inc r4           # left++
+    dec r5           # right--
+    br L2            # Continue swapping
+
+L6: # Finished reversing the array
+`
+                },        .solution-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .solution-btn:hover {
+            background-color: #5a6268;
+        }
+        
+        /* Enhanced action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .run-btn, .hint-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .run-btn {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .run-btn:hover {
+            background-color: #e08600;
+        }
+        
+        .hint-btn {
+            background-color: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+        
+        .hint-btn:hover {
+            background-color: rgba(65, 105, 225, 0.1);
+        }<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -168,6 +794,188 @@
             margin-bottom: 2rem;
         }
         
+        /* Memory layout table styling */
+        .memory-layout {
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        
+        .memory-table table, .register-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .memory-table th, .memory-table td,
+        .register-table th, .register-table td {
+            border: 1px solid #444;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        
+        .memory-table th, .register-table th {
+            background-color: #333;
+        }
+        
+        .memory-table tr:nth-child(even),
+        .register-table tr:nth-child(even) {
+            background-color: #383838;
+        }
+        
+        /* Execution results styling */
+        .execution-panel {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .execution-results {
+            background-color: #252525;
+            border-radius: 4px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            margin: 1rem 0;
+            min-height: 100px;
+        }
+        
+        .no-results {
+            color: #777;
+            text-align: center;
+            padding: 2rem 0;
+        }
+        
+        .register-view {
+            margin-top: 1.5rem;
+        }
+        
+        .result-success {
+            color: var(--success);
+        }
+        
+        .result-error {
+            color: var(--error);
+        }
+        
+        .expected-output {
+            background-color: #252525;
+            border-radius: 4px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+        }
+        
+        /* Execution log styling */
+        .execution-log {
+            margin-bottom: 1.5rem;
+        }
+        
+        .log-step {
+            margin-bottom: 0.5rem;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .step-num {
+            flex: 0 0 1.5rem;
+            font-weight: bold;
+        }
+        
+        .instruction {
+            flex: 1;
+            min-width: 200px;
+            margin-right: 1rem;
+            color: var(--accent);
+        }
+        
+        .result {
+            flex: 2;
+            color: var(--text-secondary);
+        }
+        
+        .verification-results {
+            margin-top: 1.5rem;
+            border-top: 1px solid #444;
+            padding-top: 1rem;
+        }
+        
+        .verification-item {
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .verification-summary {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 4px;
+        }
+        
+        /* Solution status indicators */
+        .problem-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-left: auto;
+        }
+        
+        .status-solved {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .status-attempted {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        /* Modal for hints */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 80%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+        
+        .close-modal:hover {
+            color: var(--accent);
+        }
+        
         .terminal-container {
             background-color: var(--terminal-bg);
             border-radius: 8px;
@@ -264,7 +1072,7 @@
         <nav>
             <ul>
                 <li><a href="#" class="active">Problems</a></li>
-                <li><a href="#">Learn</a></li>
+                <li><a href="#" id="show-reference">Reference</a></li>
                 <li><a href="#">About</a></li>
             </ul>
         </nav>
@@ -365,10 +1173,33 @@
                 <h3>Example:</h3>
                 <pre id="detail-example">Example will be loaded here.</pre>
                 
+                <h3>Memory Layout:</h3>
+                <div id="detail-memory" class="memory-layout">
+                    <div class="memory-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Address</th>
+                                    <th>Description</th>
+                                    <th>Initial Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="memory-table-body">
+                                <!-- Memory layout will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
                 <h3>Constraints:</h3>
                 <ul id="detail-constraints">
                     <li>Constraints will be loaded here.</li>
                 </ul>
+                
+                <h3>Expected Output:</h3>
+                <div id="detail-expected" class="expected-output">
+                    Expected results will be displayed here.
+                </div>
             </div>
             
             <h2>Your Solution:</h2>
@@ -382,9 +1213,42 @@
 </div>
             </div>
             
+            <div class="execution-panel">
+                <h3>Execution Results</h3>
+                <div id="execution-results" class="execution-results">
+                    <div class="no-results">Submit your code to see results</div>
+                </div>
+                
+                <div class="register-view">
+                    <h4>Register State</h4>
+                    <div class="register-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Register</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>r0</td><td id="reg-r0">0x00000000</td></tr>
+                                <tr><td>r1</td><td id="reg-r1">0x00000000</td></tr>
+                                <tr><td>r2</td><td id="reg-r2">0x00000000</td></tr>
+                                <tr><td>r3</td><td id="reg-r3">0x00000000</td></tr>
+                                <tr><td>r4</td><td id="reg-r4">0x00000000</td></tr>
+                                <tr><td>r5</td><td id="reg-r5">0x00000000</td></tr>
+                                <tr><td>r6</td><td id="reg-r6">0x00000000</td></tr>
+                                <tr><td>r7</td><td id="reg-r7">0x00000000</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
             <div class="action-buttons">
                 <button class="submit-btn">Submit Solution</button>
+                <button class="run-btn">Run Code</button>
                 <button class="reset-btn">Reset Code</button>
+                <button class="hint-btn">Show Hint</button>
             </div>
         </div>
     </main>
@@ -393,6 +1257,133 @@
         <p>SM213 Assembly LeetCode - A practice platform for assembly programming</p>
         <p>Based on the SM213 Instruction Set Architecture</p>
     </footer>
+
+    <!-- Hint Modal -->
+    <div id="hint-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Hint</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div id="hint-content">
+                Hint will appear here.
+            </div>
+        </div>
+    </div>
+
+    <!-- SM213 Reference Modal -->
+    <div id="reference-modal" class="modal">
+        <div class="modal-content" style="max-width: 80%; width: 800px;">
+            <div class="modal-header">
+                <h3>SM213 Instruction Set Reference</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div id="reference-content" class="reference-content">
+                <h4>Basic Instruction Format</h4>
+                <table class="reference-table">
+                    <thead>
+                        <tr>
+                            <th>Operation</th>
+                            <th>Assembly</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Load immediate</td>
+                            <td><code>ld $v, rd</code></td>
+                            <td>Load immediate value v into register rd</td>
+                        </tr>
+                        <tr>
+                            <td>Load base+offset</td>
+                            <td><code>ld o(rs), rd</code></td>
+                            <td>Load from memory at address rs+o into rd</td>
+                        </tr>
+                        <tr>
+                            <td>Load indexed</td>
+                            <td><code>ld (rs,ri,4), rd</code></td>
+                            <td>Load from memory at address rs+ri*4 into rd</td>
+                        </tr>
+                        <tr>
+                            <td>Store base+offset</td>
+                            <td><code>st rs, o(rd)</code></td>
+                            <td>Store rs to memory at address rd+o</td>
+                        </tr>
+                        <tr>
+                            <td>Store indexed</td>
+                            <td><code>st rs, (rd,ri,4)</code></td>
+                            <td>Store rs to memory at address rd+ri*4</td>
+                        </tr>
+                        <tr>
+                            <td>Move</td>
+                            <td><code>mov rs, rd</code></td>
+                            <td>Copy value from rs to rd</td>
+                        </tr>
+                        <tr>
+                            <td>Add</td>
+                            <td><code>add rs, rd</code></td>
+                            <td>Add rs to rd, storing result in rd</td>
+                        </tr>
+                        <tr>
+                            <td>And</td>
+                            <td><code>and rs, rd</code></td>
+                            <td>Bitwise AND rs with rd, storing result in rd</td>
+                        </tr>
+                        <tr>
+                            <td>Increment</td>
+                            <td><code>inc rd</code></td>
+                            <td>Add 1 to rd</td>
+                        </tr>
+                        <tr>
+                            <td>Increment address</td>
+                            <td><code>inca rd</code></td>
+                            <td>Add 4 to rd</td>
+                        </tr>
+                        <tr>
+                            <td>Decrement</td>
+                            <td><code>dec rd</code></td>
+                            <td>Subtract 1 from rd</td>
+                        </tr>
+                        <tr>
+                            <td>Decrement address</td>
+                            <td><code>deca rd</code></td>
+                            <td>Subtract 4 from rd</td>
+                        </tr>
+                        <tr>
+                            <td>Not</td>
+                            <td><code>not rd</code></td>
+                            <td>Bitwise NOT of rd, storing result in rd</td>
+                        </tr>
+                        <tr>
+                            <td>Shift left</td>
+                            <td><code>shl $v, rd</code></td>
+                            <td>Shift rd left by v bits</td>
+                        </tr>
+                        <tr>
+                            <td>Shift right</td>
+                            <td><code>shr $v, rd</code></td>
+                            <td>Shift rd right by v bits</td>
+                        </tr>
+                        <tr>
+                            <td>Branch</td>
+                            <td><code>br a</code></td>
+                            <td>Branch to address a</td>
+                        </tr>
+                        <tr>
+                            <td>Branch if equal</td>
+                            <td><code>beq rr, a</code></td>
+                            <td>Branch to a if rr == 0</td>
+                        </tr>
+                        <tr>
+                            <td>Branch if greater</td>
+                            <td><code>bgt rr, a</code></td>
+                            <td>Branch to a if rr > 0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -411,19 +1402,254 @@
             const detailConstraints = document.getElementById('detail-constraints');
             const difficultyDetail = document.querySelector('.problem-difficulty-detail');
             
-            // Store default template for each problem
-            const codeTemplates = {
-                1: `# Sum of Two Numbers
+            // Problem data structure
+            const problemData = {
+                1: {
+                    title: "Sum of Two Numbers",
+                    difficulty: "easy",
+                    description: `<p>Write SM213 assembly code to add two numbers stored in memory and save the result back to memory.</p>
+                    <p>Your code should:</p>
+                    <ol>
+                        <li>Load the first number from memory location 0x1000</li>
+                        <li>Load the second number from memory location 0x1004</li>
+                        <li>Add these two numbers</li>
+                        <li>Store the result at memory location 0x1008</li>
+                    </ol>`,
+                    example: `Given:
+- Memory[0x1000] = 5
+- Memory[0x1004] = 7
+
+After execution:
+- Memory[0x1008] should contain 12`,
+                    memoryLayout: [
+                        { address: "0x1000", description: "First number", value: "5" },
+                        { address: "0x1004", description: "Second number", value: "7" },
+                        { address: "0x1008", description: "Result (initially empty)", value: "0" }
+                    ],
+                    constraints: [
+                        "You must use only SM213 instructions.",
+                        "Optimize for the fewest instructions possible.",
+                        "Your solution should work for any integer values at the given memory locations."
+                    ],
+                    expectedOutput: "Memory[0x1008] = 12",
+                    hint: "Remember that SM213 provides load and store instructions to access memory. Use ld to load values from memory into registers, add to perform the addition, and st to store the result back to memory.",
+                    template: `# Sum of Two Numbers
 # Implement code to add two numbers from memory
 # The numbers are stored at memory locations 0x1000 and 0x1004
 # Store the result at memory location 0x1008
 
 `,
-                2: `# Swap Variables
+                    solution: `# Solution for Sum of Two Numbers
+ld 0x1000, r0   # Load first number into r0
+ld 0x1004, r1   # Load second number into r1
+add r1, r0      # Add r1 to r0, result is in r0
+st r0, 0x1008   # Store result to memory location 0x1008
+`
+                },
+                2: {
+                    title: "Swap Variables",
+                    difficulty: "easy",
+                    description: `<p>Write SM213 assembly code to swap the values of two variables stored in memory.</p>
+                    <p>Your code should:</p>
+                    <ol>
+                        <li>Load the value from memory location 0x1000</li>
+                        <li>Load the value from memory location 0x1004</li>
+                        <li>Swap these values</li>
+                        <li>Store the swapped values back to their original memory locations</li>
+                    </ol>`,
+                    example: `Given:
+- Memory[0x1000] = 10
+- Memory[0x1004] = 20
+
+After execution:
+- Memory[0x1000] should contain 20
+- Memory[0x1004] should contain 10`,
+                    memoryLayout: [
+                        { address: "0x1000", description: "First variable", value: "10" },
+                        { address: "0x1004", description: "Second variable", value: "20" }
+                    ],
+                    constraints: [
+                        "You must use only SM213 instructions.",
+                        "You must perform a true swap (you cannot use hardcoded values).",
+                        "Your solution should work for any integer values at the given memory locations."
+                    ],
+                    expectedOutput: "Memory[0x1000] = 20\nMemory[0x1004] = 10",
+                    hint: "You'll need a temporary register to hold one of the values during the swap.",
+                    template: `# Swap Variables
 # Swap the values stored at memory locations 0x1000 and 0x1004
+# Use registers as needed for temporary storage
 
 `,
-                // Templates for other problems would be defined here
+                    solution: `# Solution for Swap Variables
+ld 0x1000, r0   # Load first value into r0
+ld 0x1004, r1   # Load second value into r1
+st r0, 0x1004   # Store first value to second location
+st r1, 0x1000   # Store second value to first location
+`
+                },
+                3: {
+                    title: "Find Maximum",
+                    difficulty: "medium",
+                    description: `<p>Write SM213 assembly code to find the maximum value in an array of integers.</p>
+                    <p>Your code should:</p>
+                    <ol>
+                        <li>Load the array from memory starting at location 0x1000</li>
+                        <li>The array length is stored at 0x1000</li>
+                        <li>The array elements start at 0x1004</li>
+                        <li>Find the maximum value in the array</li>
+                        <li>Store the maximum value at memory location 0x2000</li>
+                    </ol>`,
+                    example: `Given:
+- Memory[0x1000] = 5 (array length)
+- Memory[0x1004] = 10
+- Memory[0x1008] = 45
+- Memory[0x100C] = 30
+- Memory[0x1010] = 25
+- Memory[0x1014] = 15
+
+After execution:
+- Memory[0x2000] should contain 45`,
+                    memoryLayout: [
+                        { address: "0x1000", description: "Array length", value: "5" },
+                        { address: "0x1004", description: "Array[0]", value: "10" },
+                        { address: "0x1008", description: "Array[1]", value: "45" },
+                        { address: "0x100C", description: "Array[2]", value: "30" },
+                        { address: "0x1010", description: "Array[3]", value: "25" },
+                        { address: "0x1014", description: "Array[4]", value: "15" },
+                        { address: "0x2000", description: "Result (max value)", value: "0" }
+                    ],
+                    constraints: [
+                        "You must use only SM213 instructions.",
+                        "Your solution should work for any array of integers with the given memory layout.",
+                        "The array can have between 1 and 100 elements."
+                    ],
+                    expectedOutput: "Memory[0x2000] = 45",
+                    hint: "You'll need to implement a loop to iterate through the array and keep track of the maximum value found so far.",
+                    template: `# Find Maximum
+# Find the maximum value in an array of integers
+# Array length is at 0x1000
+# Array elements start at 0x1004
+# Store the maximum value at 0x2000
+
+`,
+                    solution: `# Solution for Find Maximum
+ld 0x1000, r0   # Load array length into r0
+ld 0x1004, r1   # Load first element into r1 (current max)
+ld $1, r2       # Initialize counter r2 = 1
+ld $4, r3       # Initialize offset increment (4 bytes per element)
+ld $0x1004, r4  # Store base address in r4
+
+L0: beq r2, L1  # If counter == 0, exit loop
+    add r3, r4  # Increment address by 4
+    ld (r4), r5 # Load next element into r5
+    bgt r5, L2  # If r5 > r1 (new max), jump to L2
+    br L3       # Skip update
+L2: mov r5, r1  # Update max value
+L3: dec r0      # Decrement remaining count
+    beq r0, L1  # If count == 0, exit loop
+    inc r2      # Increment counter
+    br L0       # Repeat loop
+
+L1: st r1, 0x2000  # Store maximum value to result location
+`
+                },
+                4: {
+                    title: "Multiply without *",
+                    difficulty: "medium",
+                    description: `<p>Implement multiplication using only addition operations. The SM213 instruction set doesn't have a multiplication instruction, so you'll need to implement it using a loop and addition.</p>
+                    <p>Your code should:</p>
+                    <ol>
+                        <li>Load the first number (multiplicand) from memory location 0x1000</li>
+                        <li>Load the second number (multiplier) from memory location 0x1004</li>
+                        <li>Calculate the product using only addition and loops</li>
+                        <li>Store the result at memory location 0x1008</li>
+                    </ol>`,
+                    example: `Given:
+- Memory[0x1000] = 6 (multiplicand)
+- Memory[0x1004] = 7 (multiplier)
+
+After execution:
+- Memory[0x1008] should contain 42`,
+                    memoryLayout: [
+                        { address: "0x1000", description: "Multiplicand", value: "6" },
+                        { address: "0x1004", description: "Multiplier", value: "7" },
+                        { address: "0x1008", description: "Result (product)", value: "0" }
+                    ],
+                    constraints: [
+                        "You must use only SM213 instructions.",
+                        "You cannot use a multiplication instruction (there isn't one in SM213).",
+                        "Your solution should work for any non-negative integer values."
+                    ],
+                    expectedOutput: "Memory[0x1008] = 42",
+                    hint: "Think of multiplication as repeated addition. You'll need to set up a loop that adds the multiplicand to the result for each iteration.",
+                    template: `# Multiply without *
+# Implement multiplication using only addition
+# Multiplicand is at memory location 0x1000
+# Multiplier is at memory location 0x1004
+# Store the product at memory location 0x1008
+
+`,
+                    solution: `# Solution for Multiply without *
+ld 0x1000, r0   # Load multiplicand into r0
+ld 0x1004, r1   # Load multiplier into r1
+ld $0, r2       # Initialize product r2 = 0
+
+# Loop to perform multiplication through repeated addition
+L0: beq r1, L1  # If multiplier == 0, exit loop
+    add r0, r2  # Add multiplicand to product
+    dec r1      # Decrement multiplier
+    br L0       # Repeat loop
+
+L1: st r2, 0x1008  # Store product to result location
+`
+                },
+                5: {
+                    title: "Reverse Array",
+                    difficulty: "medium",
+                    description: `<p>Write SM213 assembly code to reverse the order of elements in an array.</p>
+                    <p>Your code should:</p>
+                    <ol>
+                        <li>The array length is stored at memory location 0x1000</li>
+                        <li>The array elements start at memory location 0x1004</li>
+                        <li>Reverse the array in-place (modify the original array)</li>
+                    </ol>`,
+                    example: `Given:
+- Memory[0x1000] = 5 (array length)
+- Memory[0x1004] = 10 (first element)
+- Memory[0x1008] = 20
+- Memory[0x100C] = 30
+- Memory[0x1010] = 40
+- Memory[0x1014] = 50 (last element)
+
+After execution:
+- Memory[0x1004] = 50 (first element, swapped)
+- Memory[0x1008] = 40
+- Memory[0x100C] = 30
+- Memory[0x1010] = 20
+- Memory[0x1014] = 10 (last element, swapped)`,
+                    memoryLayout: [
+                        { address: "0x1000", description: "Array length", value: "5" },
+                        { address: "0x1004", description: "Array[0]", value: "10" },
+                        { address: "0x1008", description: "Array[1]", value: "20" },
+                        { address: "0x100C", description: "Array[2]", value: "30" },
+                        { address: "0x1010", description: "Array[3]", value: "40" },
+                        { address: "0x1014", description: "Array[4]", value: "50" }
+                    ],
+                    constraints: [
+                        "You must use only SM213 instructions.",
+                        "Your solution should work for any array length and values.",
+                        "You must reverse the array in-place (do not create a new array)."
+                    ],
+                    expectedOutput: "Memory[0x1004] = 50\nMemory[0x1008] = 40\nMemory[0x100C] = 30\nMemory[0x1010] = 20\nMemory[0x1014] = 10",
+                    hint: "You'll need to iterate from both ends of the array toward the middle, swapping pairs of elements as you go.",
+                    template: `# Reverse Array
+# Reverse the order of elements in an array
+# Array length is at memory location 0x1000
+# Array elements start at memory location 0x1004
+
+`
+                }
+                // Additional problems will be defined as needed
             };
             
             // Terminal functionality
@@ -454,34 +1680,93 @@
                 }
             });
             
+            // Function to populate the memory table
+            function populateMemoryTable(memoryLayout) {
+                const tableBody = document.getElementById('memory-table-body');
+                tableBody.innerHTML = '';
+                
+                memoryLayout.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.address}</td>
+                        <td>${item.description}</td>
+                        <td>${item.value}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+            
+            // Function to populate constraints list
+            function populateConstraints(constraints) {
+                const constraintsList = document.getElementById('detail-constraints');
+                constraintsList.innerHTML = '';
+                
+                constraints.forEach(constraint => {
+                    const item = document.createElement('li');
+                    item.textContent = constraint;
+                    constraintsList.appendChild(item);
+                });
+            }
+            
             // Show problem details when a card is clicked
             problemCards.forEach(card => {
                 card.addEventListener('click', function() {
                     const problemId = this.getAttribute('data-problem-id');
-                    const title = this.querySelector('.problem-title').textContent;
-                    const difficultyClass = this.querySelector('.problem-difficulty').classList[1];
-                    const difficulty = this.querySelector('.problem-difficulty').textContent;
+                    const problem = problemData[problemId];
                     
-                    // Update problem details
-                    detailTitle.textContent = title;
-                    difficultyDetail.textContent = difficulty;
-                    difficultyDetail.className = 'problem-difficulty-detail ' + difficultyClass;
-                    
-                    // Set code template based on problem ID
-                    if (codeTemplates[problemId]) {
-                        codeEditor.textContent = codeTemplates[problemId];
-                    } else {
+                    if (!problem) {
+                        // If problem data is not available, use default placeholders
+                        const title = this.querySelector('.problem-title').textContent;
+                        const difficultyClass = this.querySelector('.problem-difficulty').classList[1];
+                        const difficulty = this.querySelector('.problem-difficulty').textContent;
+                        
+                        // Update problem details
+                        detailTitle.textContent = title;
+                        difficultyDetail.textContent = difficulty;
+                        difficultyDetail.className = 'problem-difficulty-detail ' + difficultyClass;
+                        
+                        // Set default code template
                         codeEditor.textContent = `# Write your SM213 assembly code for problem ${problemId} here\n`;
+                        
+                        // For now, we'll use placeholders for the content
+                        detailDescription.innerHTML = `
+                            <p>This is the detailed description for problem ${problemId}: ${title}.</p>
+                            <p>The actual problem statement will be loaded here.</p>
+                        `;
+                        
+                        detailExample.textContent = 'Example input and output will be displayed here.';
+                        populateConstraints(['You must use only SM213 instructions.', 'Optimize for the fewest instructions possible.']);
+                        document.getElementById('detail-expected').textContent = 'Expected results will be displayed here.';
+                        
+                        // Hide memory layout if not available
+                        document.getElementById('detail-memory').style.display = 'none';
+                    } else {
+                        // Use the structured problem data
+                        detailTitle.textContent = problem.title;
+                        difficultyDetail.textContent = problem.difficulty.charAt(0).toUpperCase() + problem.difficulty.slice(1);
+                        difficultyDetail.className = 'problem-difficulty-detail ' + problem.difficulty;
+                        
+                        // Set code template from problem data
+                        codeEditor.textContent = problem.template;
+                        
+                        // Update problem content
+                        detailDescription.innerHTML = problem.description;
+                        detailExample.textContent = problem.example;
+                        populateConstraints(problem.constraints);
+                        document.getElementById('detail-expected').textContent = problem.expectedOutput;
+                        
+                        // Show memory layout with data
+                        document.getElementById('detail-memory').style.display = 'block';
+                        populateMemoryTable(problem.memoryLayout);
                     }
                     
-                    // For now, we'll use placeholders for the content
-                    detailDescription.innerHTML = `
-                        <p>This is the detailed description for problem ${problemId}: ${title}.</p>
-                        <p>The actual problem statement will be loaded here.</p>
-                    `;
+                    // Reset execution results
+                    document.getElementById('execution-results').innerHTML = '<div class="no-results">Submit your code to see results</div>';
                     
-                    detailExample.textContent = 'Example input and output will be displayed here.';
-                    detailConstraints.innerHTML = '<li>You must use only SM213 instructions.</li><li>Optimize for the fewest instructions possible.</li>';
+                    // Reset register view
+                    for (let i = 0; i < 8; i++) {
+                        document.getElementById(`reg-r${i}`).textContent = '0x00000000';
+                    }
                     
                     // Show the detail view, hide the list view
                     problemsListView.style.display = 'none';
@@ -498,33 +1783,154 @@
                 });
             });
             
-            // Reset button functionality
-            resetBtn.addEventListener('click', function() {
-                const problemId = detailTitle.textContent;
-                // Find the problem ID from the title
-                for (const card of problemCards) {
-                    if (card.querySelector('.problem-title').textContent === problemId) {
-                        const id = card.getAttribute('data-problem-id');
-                        if (codeTemplates[id]) {
-                            codeEditor.textContent = codeTemplates[id];
-                        } else {
-                            codeEditor.textContent = `# Write your SM213 assembly code for problem ${id} here\n`;
+            // Basic SM213 parser and simulator
+            class SM213Simulator {
+                constructor(memoryLayout) {
+                    this.memory = {};
+                    this.registers = Array(8).fill(0);
+                    this.pc = 0;
+                    
+                    // Initialize memory from layout
+                    memoryLayout.forEach(item => {
+                        const address = parseInt(item.address, 16);
+                        const value = parseInt(item.value, 10);
+                        this.memory[address] = value;
+                    });
+                }
+                
+                parseInstructions(codeText) {
+                    const lines = codeText.split('\n');
+                    const instructions = [];
+                    
+                    for (let line of lines) {
+                        // Remove comments and trim
+                        line = line.split('#')[0].trim();
+                        
+                        if (!line) continue;
+                        
+                        // Handle labels (ending with colon)
+                        if (line.includes(':')) {
+                            const labelParts = line.split(':');
+                            const labelName = labelParts[0].trim();
+                            instructions.push({
+                                op: labelName + ':',
+                                args: [],
+                                original: labelName + ':'
+                            });
+                            
+                            // Process any instruction after the label on the same line
+                            const remainingCode = labelParts[1].trim();
+                            if (remainingCode) {
+                                const parts = remainingCode.split(/[\s,()]+/).filter(part => part);
+                                if (parts.length > 0) {
+                                    instructions.push({
+                                        op: parts[0],
+                                        args: parts.slice(1),
+                                        original: remainingCode
+                                    });
+                                }
+                            }
+                            continue;
                         }
-                        break;
+                        
+                        // Basic parsing of SM213 instructions
+                        const parts = line.split(/[\s,()]+/).filter(part => part);
+                        
+                        if (parts.length > 0) {
+                            const instruction = {
+                                op: parts[0],
+                                args: parts.slice(1),
+                                original: line
+                            };
+                            instructions.push(instruction);
+                        }
+                    }
+                    
+                    return instructions;
+                }
+                
+                execute(instructions) {
+                    let maxIterations = 1000; // Safety limit
+                    const results = [];
+                    
+                    for (let i = 0; i < instructions.length && maxIterations > 0; i++) {
+                        const instr = instructions[i];
+                        const result = this.executeInstruction(instr);
+                        results.push({
+                            instruction: instr.original,
+                            result: result
+                        });
+                        
+                        maxIterations--;
+                    }
+                    
+                    return {
+                        results: results,
+                        registers: [...this.registers],
+                        memory: {...this.memory}
+                    };
+                }
+                
+                executeInstruction(instr) {
+                    // Very basic implementation of instruction execution
+                    try {
+                        switch (instr.op.toLowerCase()) {
+                            case 'ld':
+                                return this.executeLd(instr.args);
+                            case 'st':
+                                return this.executeSt(instr.args);
+                            case 'add':
+                                return this.executeAdd(instr.args);
+                            case 'inc':
+                                return this.executeInc(instr.args);
+                            case 'dec':
+                                return this.executeDec(instr.args);
+                            case 'mov':
+                                return this.executeMov(instr.args);
+                            case 'br':
+                                return this.executeBr(instr.args);
+                            case 'beq':
+                                return this.executeBeq(instr.args);
+                            case 'bgt':
+                                return this.executeBgt(instr.args);
+                            // Label definition (not an instruction)
+                            default:
+                                if (instr.op.endsWith(':')) {
+                                    return `Label "${instr.op.slice(0, -1)}" defined`;
+                                }
+                                return `Instruction ${instr.op} not implemented yet`;
+                        }
+                    } catch (error) {
+                        return `Error: ${error.message}`;
                     }
                 }
                 
-                // Focus back on editor
-                codeEditor.focus();
-            });
+                // Implementation of individual instructions
+                executeLd(args) {
+                    if (args[0].startsWith('
             
-            // Submit button functionality
-            submitBtn.addEventListener('click', function() {
-                const code = codeEditor.textContent;
-                // Here you would implement actual validation/execution of the SM213 code
-                alert('Submission received! (Validation would happen here in a real implementation)');
-                console.log('Submitted code:', code);
+            // Go back to problems list
+            backButton.addEventListener('click', function() {
+                problemDetailView.style.display = 'none';
+                problemsListView.style.display = 'block';
             });
+        });
+    </script>
+</body>
+</html>
+)) {
+                        // Load immediate
+                        const value = parseInt(args[0].substring(1), 0);
+                        const register = this.parseRegister(args[1]);
+                        this.registers[register] = value;
+                        return `Loaded ${value} into r${register}`;
+                    } else if (args[0].includes('(')) {
+                        // Load base+offset (simplified for demo)
+                        return "Load base+offset executed";
+                    } else {
+                        // Simplified memory access
+                        const address = parseInt(args[0], 16);
+                        const register = this.
             
             // Go back to problems list
             backButton.addEventListener('click', function() {
