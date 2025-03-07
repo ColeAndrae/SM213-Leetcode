@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SM213 Assembly LeetCode</title>
+    <style>
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0b0;
+            --accent: #4169e1;
+            --accent-hover: #6495ed;
+            --success: #4caf50;
+            --error: #f44336;
+            --warning: #ff9800;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: var(--bg-secondary);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+        
+        nav ul li a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            color: var(--accent);
+        }
+        
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .problem-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .problem-card {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .problem-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .problem-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+        
+        .problem-difficulty {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        
+        .easy {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+        
+        .medium {
+            background-color: rgba(255, 152, 0, 0.2);
+            color: var(--warning);
+        }
+        
+        .hard {
+            background-color: rgba(244, 67, 54, 0.2);
+            color: var(--error);
+        }
+        
+        .problem-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background-color: var(--bg-secondary);
+            color: var(--text-secondary);
+            margin-top: 2rem;
+        }
+        
+        /* Problem page styles */
+        .problem-container {
+            display: none;
+            margin-top: 2rem;
+        }
+        
+        .problem-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .back-button {
+            background-color: transparent;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .problem-content {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .code-editor {
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            min-height: 300px;
+            margin: 1.5rem 0;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .submit-btn, .reset-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .submit-btn {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        .reset-btn {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--text-secondary);
+        }
+        
+        .reset-btn:hover {
+            background-color: #3a3a3a;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">SM213 Assembly LeetCode</div>
+        <nav>
+            <ul>
+                <li><a href="#" class="active">Problems</a></li>
+                <li><a href="#">Learn</a></li>
+                <li><a href="#">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div id="problems-list-view">
+            <h1>SM213 Assembly Programming Challenges</h1>
+            <p>Improve your assembly programming skills with these challenges designed for the SM213 instruction set.</p>
+            
+            <div class="problem-list">
+                <!-- Problem 1 -->
+                <div class="problem-card" data-problem-id="1">
+                    <div class="problem-title">Sum of Two Numbers</div>
+                    <div class="problem-difficulty easy">Easy</div>
+                    <div class="problem-description">Write assembly code to add two numbers stored in memory and save the result.</div>
+                </div>
+                
+                <!-- Problem 2 -->
+                <div class="problem-card" data-problem-id="2">
+                    <div class="problem-title">Swap Variables</div>
+                    <div class="problem-difficulty easy">Easy</div>
+                    <div class="problem-description">Implement a routine to swap the values of two variables in memory.</div>
+                </div>
+                
+                <!-- Problem 3 -->
+                <div class="problem-card" data-problem-id="3">
+                    <div class="problem-title">Find Maximum</div>
+                    <div class="problem-difficulty medium">Medium</div>
+                    <div class="problem-description">Write code to find the maximum value in an array of integers.</div>
+                </div>
+                
+                <!-- Problem 4 -->
+                <div class="problem-card" data-problem-id="4">
+                    <div class="problem-title">Multiply without *</div>
+                    <div class="problem-difficulty medium">Medium</div>
+                    <div class="problem-description">Implement multiplication using only addition and looping.</div>
+                </div>
+                
+                <!-- Problem 5 -->
+                <div class="problem-card" data-problem-id="5">
+                    <div class="problem-title">Reverse Array</div>
+                    <div class="problem-difficulty medium">Medium</div>
+                    <div class="problem-description">Write a program to reverse the order of elements in an array.</div>
+                </div>
+                
+                <!-- Problem 6 -->
+                <div class="problem-card" data-problem-id="6">
+                    <div class="problem-title">Fibonacci Sequence</div>
+                    <div class="problem-difficulty medium">Medium</div>
+                    <div class="problem-description">Generate the first N Fibonacci numbers and store them in memory.</div>
+                </div>
+                
+                <!-- Problem 7 -->
+                <div class="problem-card" data-problem-id="7">
+                    <div class="problem-title">Binary Search</div>
+                    <div class="problem-difficulty hard">Hard</div>
+                    <div class="problem-description">Implement binary search on a sorted array to find a target value.</div>
+                </div>
+                
+                <!-- Problem 8 -->
+                <div class="problem-card" data-problem-id="8">
+                    <div class="problem-title">Bubble Sort</div>
+                    <div class="problem-difficulty hard">Hard</div>
+                    <div class="problem-description">Implement the bubble sort algorithm to sort an array of integers.</div>
+                </div>
+                
+                <!-- Problem 9 -->
+                <div class="problem-card" data-problem-id="9">
+                    <div class="problem-title">Count Set Bits</div>
+                    <div class="problem-difficulty medium">Medium</div>
+                    <div class="problem-description">Count the number of set bits (1s) in the binary representation of a number.</div>
+                </div>
+                
+                <!-- Problem 10 -->
+                <div class="problem-card" data-problem-id="10">
+                    <div class="problem-title">GCD Calculation</div>
+                    <div class="problem-difficulty hard">Hard</div>
+                    <div class="problem-description">Calculate the greatest common divisor (GCD) of two integers using Euclidean algorithm.</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Problem detail view (initially hidden) -->
+        <div id="problem-detail-view" class="problem-container">
+            <div class="problem-header">
+                <button class="back-button" id="back-to-list">← Back to Problems</button>
+                <div class="problem-difficulty-detail">Medium</div>
+            </div>
+            
+            <h1 id="detail-title">Problem Title</h1>
+            
+            <div class="problem-content">
+                <div id="detail-description">
+                    Problem description will be loaded here.
+                </div>
+                
+                <h3>Example:</h3>
+                <pre id="detail-example">Example will be loaded here.</pre>
+                
+                <h3>Constraints:</h3>
+                <ul id="detail-constraints">
+                    <li>Constraints will be loaded here.</li>
+                </ul>
+            </div>
+            
+            <h2>Your Solution:</h2>
+            <div class="code-editor" contenteditable="true" spellcheck="false">
+                # Write your SM213 assembly code here
+            </div>
+            
+            <div class="action-buttons">
+                <button class="submit-btn">Submit Solution</button>
+                <button class="reset-btn">Reset Code</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>SM213 Assembly LeetCode - A practice platform for assembly programming</p>
+        <p>Based on the SM213 Instruction Set Architecture</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const problemsListView = document.getElementById('problems-list-view');
+            const problemDetailView = document.getElementById('problem-detail-view');
+            const backButton = document.getElementById('back-to-list');
+            const problemCards = document.querySelectorAll('.problem-card');
+            
+            // Problem details elements
+            const detailTitle = document.getElementById('detail-title');
+            const detailDescription = document.getElementById('detail-description');
+            const detailExample = document.getElementById('detail-example');
+            const detailConstraints = document.getElementById('detail-constraints');
+            const difficultyDetail = document.querySelector('.problem-difficulty-detail');
+            
+            // Show problem details when a card is clicked
+            problemCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const problemId = this.getAttribute('data-problem-id');
+                    const title = this.querySelector('.problem-title').textContent;
+                    const difficultyClass = this.querySelector('.problem-difficulty').classList[1];
+                    const difficulty = this.querySelector('.problem-difficulty').textContent;
+                    
+                    // Update problem details
+                    detailTitle.textContent = title;
+                    difficultyDetail.textContent = difficulty;
+                    difficultyDetail.className = 'problem-difficulty-detail ' + difficultyClass;
+                    
+                    // For now, we'll use placeholders for the content
+                    detailDescription.innerHTML = `
+                        <p>This is the detailed description for problem ${problemId}: ${title}.</p>
+                        <p>The actual problem statement will be loaded here.</p>
+                    `;
+                    
+                    detailExample.textContent = 'Example input and output will be displayed here.';
+                    detailConstraints.innerHTML = '<li>You must use only SM213 instructions.</li><li>Optimize for the fewest instructions possible.</li>';
+                    
+                    // Show the detail view, hide the list view
+                    problemsListView.style.display = 'none';
+                    problemDetailView.style.display = 'block';
+                });
+            });
+            
+            // Go back to problems list
+            backButton.addEventListener('click', function() {
+                problemDetailView.style.display = 'none';
+                problemsListView.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
