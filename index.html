@@ -8,6 +8,9 @@
         :root {
             --bg-primary: #1a1a1a;
             --bg-secondary: #2d2d2d;
+            --terminal-bg: #0d1117;
+            --terminal-text: #e6edf3;
+            --terminal-prompt: #4169e1;
             --text-primary: #f0f0f0;
             --text-secondary: #b0b0b0;
             --accent: #4169e1;
@@ -165,13 +168,60 @@
             margin-bottom: 2rem;
         }
         
-        .code-editor {
-            background-color: #1e1e1e;
+        .terminal-container {
+            background-color: var(--terminal-bg);
             border-radius: 8px;
-            padding: 1rem;
+            padding: 0.5rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .terminal-container::before {
+            content: "● ● ●";
+            display: block;
+            color: #777;
+            font-size: 12px;
+            padding: 0 0 8px 5px;
+            border-bottom: 1px solid #333;
+            margin-bottom: 10px;
+        }
+
+        .code-editor {
+            background-color: var(--terminal-bg);
+            border-radius: 0 0 8px 8px;
+            padding: 0.5rem 0.5rem 0.5rem 2.5rem;
             font-family: 'Courier New', monospace;
             min-height: 300px;
-            margin: 1.5rem 0;
+            color: var(--terminal-text);
+            overflow: auto;
+            white-space: pre;
+            line-height: 1.5;
+            position: relative;
+            counter-reset: line;
+        }
+        
+        .code-editor::before {
+            content: "SM213>";
+            position: absolute;
+            left: 10px;
+            top: 8px;
+            color: var(--terminal-prompt);
+            user-select: none;
+        }
+        
+        .code-editor:focus {
+            outline: none;
+        }
+        
+        /* Add line numbers */
+        .line-numbers {
+            position: absolute;
+            left: 0;
+            top: 0;
+            padding: 0.5rem;
+            color: #666;
+            user-select: none;
+            text-align: right;
         }
         
         .action-buttons {
@@ -322,8 +372,14 @@
             </div>
             
             <h2>Your Solution:</h2>
-            <div class="code-editor" contenteditable="true" spellcheck="false">
-                # Write your SM213 assembly code here
+            <div id="terminal-container" class="terminal-container">
+                <div id="code-editor" class="code-editor" contenteditable="true" spellcheck="false">
+# Write your SM213 assembly code here
+# Example:
+# ld $0, r0
+# ld $5, r1
+# add r1, r0
+</div>
             </div>
             
             <div class="action-buttons">
@@ -344,6 +400,9 @@
             const problemDetailView = document.getElementById('problem-detail-view');
             const backButton = document.getElementById('back-to-list');
             const problemCards = document.querySelectorAll('.problem-card');
+            const codeEditor = document.getElementById('code-editor');
+            const submitBtn = document.querySelector('.submit-btn');
+            const resetBtn = document.querySelector('.reset-btn');
             
             // Problem details elements
             const detailTitle = document.getElementById('detail-title');
@@ -351,6 +410,49 @@
             const detailExample = document.getElementById('detail-example');
             const detailConstraints = document.getElementById('detail-constraints');
             const difficultyDetail = document.querySelector('.problem-difficulty-detail');
+            
+            // Store default template for each problem
+            const codeTemplates = {
+                1: `# Sum of Two Numbers
+# Implement code to add two numbers from memory
+# The numbers are stored at memory locations 0x1000 and 0x1004
+# Store the result at memory location 0x1008
+
+`,
+                2: `# Swap Variables
+# Swap the values stored at memory locations 0x1000 and 0x1004
+
+`,
+                // Templates for other problems would be defined here
+            };
+            
+            // Terminal functionality
+            codeEditor.addEventListener('keydown', function(e) {
+                // Handle tab key for indentation
+                if (e.key === 'Tab') {
+                    e.preventDefault();
+                    document.execCommand('insertText', false, '    ');
+                }
+                
+                // Add auto-pairing for parentheses, brackets, etc.
+                const pairs = {
+                    '(': ')',
+                    '[': ']',
+                    '{': '}',
+                };
+                
+                if (pairs[e.key]) {
+                    e.preventDefault();
+                    document.execCommand('insertText', false, e.key + pairs[e.key]);
+                    // Move cursor back between the pair
+                    const selection = window.getSelection();
+                    const range = selection.getRangeAt(0);
+                    range.setStart(range.startContainer, range.startOffset - 1);
+                    range.setEnd(range.startContainer, range.startOffset - 1);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+            });
             
             // Show problem details when a card is clicked
             problemCards.forEach(card => {
@@ -365,6 +467,13 @@
                     difficultyDetail.textContent = difficulty;
                     difficultyDetail.className = 'problem-difficulty-detail ' + difficultyClass;
                     
+                    // Set code template based on problem ID
+                    if (codeTemplates[problemId]) {
+                        codeEditor.textContent = codeTemplates[problemId];
+                    } else {
+                        codeEditor.textContent = `# Write your SM213 assembly code for problem ${problemId} here\n`;
+                    }
+                    
                     // For now, we'll use placeholders for the content
                     detailDescription.innerHTML = `
                         <p>This is the detailed description for problem ${problemId}: ${title}.</p>
@@ -377,7 +486,44 @@
                     // Show the detail view, hide the list view
                     problemsListView.style.display = 'none';
                     problemDetailView.style.display = 'block';
+                    
+                    // Focus on editor and place cursor at the end
+                    codeEditor.focus();
+                    const range = document.createRange();
+                    const sel = window.getSelection();
+                    range.selectNodeContents(codeEditor);
+                    range.collapse(false);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
                 });
+            });
+            
+            // Reset button functionality
+            resetBtn.addEventListener('click', function() {
+                const problemId = detailTitle.textContent;
+                // Find the problem ID from the title
+                for (const card of problemCards) {
+                    if (card.querySelector('.problem-title').textContent === problemId) {
+                        const id = card.getAttribute('data-problem-id');
+                        if (codeTemplates[id]) {
+                            codeEditor.textContent = codeTemplates[id];
+                        } else {
+                            codeEditor.textContent = `# Write your SM213 assembly code for problem ${id} here\n`;
+                        }
+                        break;
+                    }
+                }
+                
+                // Focus back on editor
+                codeEditor.focus();
+            });
+            
+            // Submit button functionality
+            submitBtn.addEventListener('click', function() {
+                const code = codeEditor.textContent;
+                // Here you would implement actual validation/execution of the SM213 code
+                alert('Submission received! (Validation would happen here in a real implementation)');
+                console.log('Submitted code:', code);
             });
             
             // Go back to problems list
